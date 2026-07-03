@@ -121,7 +121,7 @@
     .lobby-container {
       width: 100%;
       max-width: 600px;
-      padding: 35px 40px;
+      padding: 20px 25px;
       text-align: center;
       animation: slideIn 0.5s ease-out;
       position: relative;
@@ -141,7 +141,7 @@
     }
 
     h1 {
-      font-size: 3rem;
+      font-size: 2.2rem;
       font-weight: 900;
       margin-bottom: 2px;
       background: linear-gradient(90deg, #007aff, #00c7be, #ff2d55, #ff9500);
@@ -154,11 +154,11 @@
 
     .sub-title {
       font-family: var(--font-display);
-      font-size: 1.2rem;
+      font-size: 1.05rem;
       font-weight: 800;
       color: #ff9500;
       letter-spacing: 4px;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       text-shadow: 0 0 12px rgba(255, 149, 0, 0.4);
     }
 
@@ -181,8 +181,8 @@
       background: rgba(0, 0, 0, 0.25);
       border: 1px solid rgba(255, 255, 255, 0.04);
       border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 20px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
       text-align: left;
     }
 
@@ -237,23 +237,23 @@
     }
 
     .rules-content p {
-      font-size: 0.82rem;
-      line-height: 1.5;
+      font-size: 0.76rem;
+      line-height: 1.4;
       color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .setup-section {
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       text-align: left;
     }
 
     .setup-label {
       font-family: var(--font-display);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 2px;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       color: rgba(255, 255, 255, 0.45);
       border-left: 3px solid #ff9500;
       padding-left: 8px;
@@ -276,9 +276,9 @@
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: rgba(255, 255, 255, 0.7);
-      padding: 14px 8px;
+      padding: 8px 6px;
       font-family: var(--font-display);
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 800;
       border-radius: 12px;
       cursor: pointer;
@@ -305,13 +305,13 @@
       background: linear-gradient(90deg, #007aff 0%, #ff2d55 100%);
       border: none;
       color: #ffffff;
-      padding: 16px;
+      padding: 12px;
       font-family: var(--font-display);
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       font-weight: 900;
       border-radius: 14px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 5px;
       text-transform: uppercase;
       letter-spacing: 3px;
       box-shadow: 0 6px 25px rgba(255, 45, 85, 0.35);
@@ -325,11 +325,11 @@
 
     .more-games-link {
       display: inline-block;
-      margin-top: 16px;
+      margin-top: 8px;
       color: rgba(255, 255, 255, 0.45);
       text-decoration: none;
       font-family: var(--font-display);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 700;
       letter-spacing: 1px;
       transition: all 0.2s;
@@ -549,7 +549,8 @@
       border-top: 1px solid rgba(255, 255, 255, 0.06);
       padding: 10px 8px;
       gap: 8px;
-      z-index: 10;
+      z-index: 9999;
+      overflow: visible !important;
     }
 
     .control-column {
@@ -560,7 +561,7 @@
       border-radius: 14px;
       padding: 10px;
       position: relative;
-      overflow: hidden;
+      overflow: visible !important;
       transition: all 0.3s ease;
     }
 
@@ -595,6 +596,7 @@
       align-items: center;
       box-shadow: 0 0 10px rgba(var(--p-rgb), 0.1);
       transition: border 0.3s;
+      z-index: 99999 !important;
     }
 
     .joystick-knob {
