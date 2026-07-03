@@ -817,6 +817,15 @@
         </div>
       </div>
 
+      <!-- Prison Mode Selection -->
+      <div class="setup-section">
+        <div class="setup-label" id="setup-prison-label">감옥 모드 (구출 가능)</div>
+        <div class="grid-options-2" id="prison-options">
+          <button class="opt-btn" data-val="off">OFF (자동부활)</button>
+          <button class="opt-btn active" data-val="on">ON (구출 가능)</button>
+        </div>
+      </div>
+
       <!-- Start Button & external link -->
       <button id="start-btn">Battle Start</button>
       <div>
@@ -1128,6 +1137,7 @@
     let isCountdown = false;
     let countdownVal = 3;
     let countdownText = "";
+    let isPrisonMode = true;
 
     const PLAYER_RADIUS = 22; // 44px diameter (quite large)
 
@@ -1154,6 +1164,10 @@
 
       setupLobbyOptions('time-options', (val) => {
         gameDurationSetting = val;
+      });
+
+      setupLobbyOptions('prison-options', (val) => {
+        isPrisonMode = (val === 'on');
       });
 
       document.getElementById('start-btn').addEventListener('click', () => {
@@ -1199,6 +1213,7 @@
         document.getElementById('rules-title-text').textContent = '게임 방법';
         document.getElementById('setup-players-label').textContent = '인원 수 설정';
         document.getElementById('setup-time-label').textContent = '게임 시간 설정';
+        document.getElementById('setup-prison-label').textContent = '감옥 모드 (구출 가능)';
       });
 
       document.getElementById('lang-en-btn').addEventListener('pointerdown', (e) => {
@@ -1211,6 +1226,7 @@
         document.getElementById('rules-title-text').textContent = 'Game Rules';
         document.getElementById('setup-players-label').textContent = 'Players Count';
         document.getElementById('setup-time-label').textContent = 'Game Time';
+        document.getElementById('setup-prison-label').textContent = 'Prison Mode (Rescue)';
       });
     });
 
@@ -1791,6 +1807,13 @@
     function setupJoystickEvents(playerId, container, knob, joySize) {
       let active = false;
       let pointerId = null;
+      
+      let defaultCenterX = 0;
+      let defaultCenterY = 0;
+      
+      let containerX = 0;
+      let containerY = 0;
+
       let startX = 0;
       let startY = 0;
 
@@ -1801,30 +1824,79 @@
         pointerId = e.pointerId;
         container.setPointerCapture(e.pointerId);
 
+        const prevTransform = container.style.transform;
+        container.style.transform = 'none';
+        const rect = container.getBoundingClientRect();
+        defaultCenterX = rect.left + rect.width / 2;
+        defaultCenterY = rect.top + rect.height / 2;
+        container.style.transform = prevTransform;
+
+        containerX = e.clientX - defaultCenterX;
+        containerY = e.clientY - defaultCenterY;
+        container.style.transform = `translate(${containerX}px, ${containerY}px)`;
+
         startX = e.clientX;
         startY = e.clientY;
 
-        updateJoystickDrag(e, playerId, container, knob, startX, startY, (newX, newY) => {
-          startX = newX;
-          startY = newY;
-        });
+        knob.style.transform = 'translate(0px, 0px)';
+
+        updateRelativeJoystick(e);
       });
 
       container.addEventListener('pointermove', (e) => {
         if (active && e.pointerId === pointerId) {
           e.preventDefault();
-          updateJoystickDrag(e, playerId, container, knob, startX, startY, (newX, newY) => {
-            startX = newX;
-            startY = newY;
-          });
+          updateRelativeJoystick(e);
         }
       });
+
+      function updateRelativeJoystick(e) {
+        let dx = e.clientX - startX;
+        let dy = e.clientY - startY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDrag = container.clientWidth / 2 - knob.clientWidth / 2;
+        const angle = Math.atan2(dy, dx);
+
+        let knobX = dx;
+        let knobY = dy;
+
+        if (dist > maxDrag) {
+          const excess = dist - maxDrag;
+          const pullX = Math.cos(angle) * excess;
+          const pullY = Math.sin(angle) * excess;
+
+          containerX += pullX;
+          containerY += pullY;
+          container.style.transform = `translate(${containerX}px, ${containerY}px)`;
+
+          startX += pullX;
+          startY += pullY;
+
+          knobX = Math.cos(angle) * maxDrag;
+          knobY = Math.sin(angle) * maxDrag;
+        }
+
+        knob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+
+        const player = players.find(p => p.id === playerId);
+        if (player && !player.isDead) {
+          if (dist > 5) {
+            player.angle = angle;
+            player.joystickActive = true;
+            player.isJoystickDragging = true;
+          } else {
+            player.joystickActive = false;
+          }
+        }
+      }
 
       const stopDrag = (e) => {
         if (active && e.pointerId === pointerId) {
           e.preventDefault();
           active = false;
           pointerId = null;
+          
+          container.style.transform = 'translate(0px, 0px)';
           knob.style.transform = 'translate(0px, 0px)';
 
           const player = players.find(p => p.id === playerId);
@@ -1838,37 +1910,6 @@
       container.addEventListener('pointerup', stopDrag);
       container.addEventListener('pointercancel', stopDrag);
       container.addEventListener('pointerleave', stopDrag);
-    }
-
-    function updateJoystickDrag(e, playerId, container, knob, startX, startY, setCenter) {
-      let dx = e.clientX - startX;
-      let dy = e.clientY - startY;
-
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const maxDrag = container.clientWidth / 2 - knob.clientWidth / 2;
-
-      const angle = Math.atan2(dy, dx);
-
-      let knobX = dx;
-      let knobY = dy;
-      if (dist > maxDrag) {
-        knobX = Math.cos(angle) * maxDrag;
-        knobY = Math.sin(angle) * maxDrag;
-        setCenter(e.clientX - knobX, e.clientY - knobY);
-      }
-
-      knob.style.transform = `translate(${knobX}px, ${knobY}px)`;
-
-      const player = players.find(p => p.id === playerId);
-      if (player && !player.isDead) {
-        if (dist > 5) {
-          player.angle = angle;
-          player.joystickActive = true;
-          player.isJoystickDragging = true;
-        } else {
-          player.joystickActive = false;
-        }
-      }
     }
 
     function updateHeaderUI() {
@@ -1984,9 +2025,11 @@
       players.forEach(p => {
         if (p.role === 'thief') {
           if (p.isDead) {
-            p.respawnTimer -= dt;
-            if (p.respawnTimer <= 0) {
-              respawnThief(p);
+            if (!isPrisonMode) {
+              p.respawnTimer -= dt;
+              if (p.respawnTimer <= 0) {
+                respawnThief(p);
+              }
             }
           }
           if (p.invulnerableTimer > 0) {
@@ -2131,7 +2174,7 @@
           const dist = Math.sqrt((cop.x - thief.x) * (cop.x - thief.x) + (cop.y - thief.y) * (cop.y - thief.y));
           if (dist < PLAYER_RADIUS * 2) {
             thief.isDead = true;
-            thief.respawnTimer = 5000;
+            thief.respawnTimer = isPrisonMode ? 999999 : 5000;
             thief.stats.deaths++;
             cop.stats.captures++;
 
@@ -2147,6 +2190,33 @@
           }
         });
       });
+
+      // 5-1. 감옥 모드: 동료 구조 및 조기 라운드 종료
+      if (isPrisonMode) {
+        const aliveThieves = players.filter(p => !p.isDead && p.role === 'thief');
+        const jailedThieves = players.filter(p => p.isDead && p.role === 'thief');
+
+        // 구조 체크
+        aliveThieves.forEach(activeThief => {
+          jailedThieves.forEach(jailedThief => {
+            const dist = Math.sqrt((activeThief.x - jailedThief.x) * (activeThief.x - jailedThief.x) + (activeThief.y - jailedThief.y) * (activeThief.y - jailedThief.y));
+            if (dist < PLAYER_RADIUS * 2) {
+              jailedThief.isDead = false;
+              jailedThief.invulnerableTimer = 3000; // 구조 후 3초 무적
+              jailedThief.respawnTimer = 0;
+              spawnParticles(jailedThief.x, jailedThief.y, 8, 'money'); // 구출 이펙트
+              sound.playRespawn(); // 구출 부활음
+            }
+          });
+        });
+
+        // 모든 도둑 감금 시 조기 종료
+        const currentAliveThieves = players.filter(p => !p.isDead && p.role === 'thief');
+        if (currentAliveThieves.length === 0) {
+          handleRoundEnd();
+          return;
+        }
+      }
 
       updateParticles(dt);
     }
@@ -2182,10 +2252,10 @@
       } else {
         if (p.isDead) {
           const rem = Math.ceil(p.respawnTimer / 1000);
-          statsSpan.textContent = `체포됨 (⛓️)`;
+          statsSpan.textContent = isPrisonMode ? `감금됨 (⛓️)` : `체포됨 (⛓️)`;
           card.className = 'status-circle jail';
           icon.textContent = '⛓️';
-          label.textContent = `${rem}초`;
+          label.textContent = isPrisonMode ? '구조대기' : `${rem}초`;
         } else if (p.invulnerableTimer > 0) {
           statsSpan.textContent = `속도: 3.2 (🛡️)`;
           card.className = 'status-circle shield';
@@ -2316,7 +2386,28 @@
 
       // Render Players
       players.forEach(p => {
-        if (p.isDead) return;
+        if (p.isDead) {
+          if (isPrisonMode && p.role === 'thief') {
+            ctx.save();
+            ctx.strokeStyle = '#555555';
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, PLAYER_RADIUS, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.font = '33px "Segoe UI Emoji", "Apple Color Emoji", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⛓️', p.x, p.y);
+
+            ctx.fillStyle = '#ff2d55';
+            ctx.font = 'bold 12px Orbitron';
+            ctx.fillText(`P${p.id} ⛓️`, p.x, p.y - PLAYER_RADIUS - 10);
+            ctx.restore();
+          }
+          return;
+        }
 
         ctx.save();
 
@@ -2464,6 +2555,16 @@
       const aScore = teamScores.teamA;
       const bScore = teamScores.teamB;
 
+      let aCoins = 0;
+      let bCoins = 0;
+      players.forEach(p => {
+        if (p.team === 'teamA') {
+          aCoins += p.stats.coinsEaten;
+        } else {
+          bCoins += p.stats.coinsEaten;
+        }
+      });
+
       const winnerDiv = document.getElementById('winner-announcement');
       if (aScore > bScore) {
         winnerDiv.innerHTML = `🏆 A팀 승리! (검거: ${aScore} vs ${bScore})`;
@@ -2472,8 +2573,16 @@
         winnerDiv.innerHTML = `🏆 B팀 승리! (검거: ${bScore} vs ${aScore})`;
         winnerDiv.style.color = '#ff2d55';
       } else {
-        winnerDiv.innerHTML = `🤝 무승부! (검거: ${aScore} vs ${bScore})`;
-        winnerDiv.style.color = '#00c7be';
+        if (aCoins > bCoins) {
+          winnerDiv.innerHTML = `🏆 A팀 승리! [동점 판정] (검거: ${aScore} vs ${bScore} | 💰 동전: ${aCoins} vs ${bCoins})`;
+          winnerDiv.style.color = '#007aff';
+        } else if (bCoins > aCoins) {
+          winnerDiv.innerHTML = `🏆 B팀 승리! [동점 판정] (검거: ${bScore} vs ${aScore} | 💰 동전: ${bCoins} vs ${aCoins})`;
+          winnerDiv.style.color = '#ff2d55';
+        } else {
+          winnerDiv.innerHTML = `🤝 무승부! (검거: ${aScore} vs ${bScore} | 💰 동전: ${aCoins} vs ${bCoins})`;
+          winnerDiv.style.color = '#00c7be';
+        }
       }
 
       const tbody = document.getElementById('leaderboard-body-overlay');
