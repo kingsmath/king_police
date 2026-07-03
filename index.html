@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5YW0T2C109"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-5YW0T2C109');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>경찰킹 도둑킹 - Police & Thief King</title>
+  <!-- Google Fonts for retro/cyber styling -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Inter:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #06060c;
+      --panel-bg: rgba(18, 18, 30, 0.45);
+      --panel-border: rgba(255, 255, 255, 0.05);
+      --font-primary: 'Inter', sans-serif;
+      --font-display: 'Orbitron', sans-serif;
+
+      --police-color: #007aff;
+      --thief-color: #ff2d55;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 50%, #151525 0%, #06060c 100%);
+      color: #ffffff;
+      font-family: var(--font-primary);
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+    }
+
+    /* GLOBAL NAV BUTTONS */
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      z-index: 100;
+      width: 44px;
+      height: 44px;
+      background: rgba(18, 18, 30, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #ffffff;
+      font-size: 1.3rem;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      touch-action: manipulation;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: scale(1.05);
+    }
+
+    #home-btn {
+      left: 15px;
+      display: none;
+    }
+
+    #fullscreen-btn {
+      right: 15px;
+    }
+
+    /* Screen container styling */
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* PRESTIGE GLASS CARD DESIGN */
+    .glass-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* LOBBY CONTAINER */
+    .lobby-container {
+      width: 100%;
+      max-width: 600px;
+      padding: 35px 40px;
+      text-align: center;
+      animation: slideIn 0.5s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 2px;
+      background: linear-gradient(90deg, #007aff, #00c7be, #ff2d55, #ff9500);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: textGradient 8s ease infinite;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+    }
+
+    .sub-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ff9500;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 12px rgba(255, 149, 0, 0.4);
+    }
+
+    @keyframes textGradient {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Interactive Rules Container */
+    .rules-container {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .rules-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .rules-title {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      color: #00c7be;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 800;
+    }
+
+    .lang-selector {
+      display: flex;
+      gap: 6px;
+    }
+
+    .lang-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.6);
+      padding: 4px 10px;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 800;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      outline: none;
+      touch-action: manipulation;
+    }
+
+    .lang-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .lang-btn.active {
+      background: #007aff;
+      border-color: #00a2ff;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 122, 255, 0.4);
+    }
+
+    .rules-content p {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 6px;
+    }
+
+    .setup-section {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .setup-label {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      color: rgba(255, 255, 255, 0.45);
+      border-left: 3px solid #ff9500;
+      padding-left: 8px;
+      font-weight: bold;
+    }
+
+    .grid-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .grid-options-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .opt-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 14px 8px;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 800;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      touch-action: manipulation;
+      text-align: center;
+    }
+
+    .opt-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+
+    .opt-btn.active {
+      background: linear-gradient(135deg, #ff9500 0%, #cc7a00 100%);
+      border-color: #ffaa33;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 149, 0, 0.45);
+      transform: translateY(-2px);
+    }
+
+    #start-btn {
+      width: 100%;
+      background: linear-gradient(90deg, #007aff 0%, #ff2d55 100%);
+      border: none;
+      color: #ffffff;
+      padding: 16px;
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 900;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      box-shadow: 0 6px 25px rgba(255, 45, 85, 0.35);
+      transition: all 0.25s ease;
+      touch-action: manipulation;
+    }
+
+    #start-btn:active {
+      transform: scale(0.98);
+    }
+
+    .more-games-link {
+      display: inline-block;
+      margin-top: 16px;
+      color: rgba(255, 255, 255, 0.45);
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+      padding-bottom: 2px;
+      touch-action: manipulation;
+    }
+
+    .more-games-link:hover {
+      color: #007aff;
+      border-color: #007aff;
+      text-shadow: 0 0 10px rgba(0, 122, 255, 0.4);
+    }
+
+    /* GAME SCREEN */
+    #game-screen {
+      padding: 0;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      background: #040408;
+    }
+
+    /* Game Header Scoreboard */
+    #game-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background: rgba(6, 6, 10, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+
+    .team-score-badge {
+      padding: 10px 20px;
+      border-radius: 14px;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .team-score-badge.a-score {
+      background: rgba(0, 122, 255, 0.15);
+      border-color: rgba(0, 122, 255, 0.2);
+      color: #007aff;
+      text-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
+    }
+
+    .team-score-badge.b-score {
+      background: rgba(255, 45, 85, 0.15);
+      border-color: rgba(255, 45, 85, 0.2);
+      color: #ff2d55;
+      text-shadow: 0 0 10px rgba(255, 45, 85, 0.3);
+    }
+
+    .team-score-badge.active-police {
+      box-shadow: 0 0 20px currentColor;
+      border-color: currentColor !important;
+      animation: activePulse 1.5s infinite alternate;
+    }
+
+    @keyframes activePulse {
+      from {
+        transform: scale(1);
+      }
+
+      to {
+        transform: scale(1.05);
+      }
+    }
+
+    #timer-display {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #00c7be;
+      text-shadow: 0 0 12px rgba(0, 199, 190, 0.5);
+      background: rgba(8, 8, 12, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 4px 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Modal Overlays (Halftime & Game Over) */
+    #halftime-overlay,
+    #gameover-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      display: none;
+      width: 90%;
+      max-width: 700px;
+      padding: 35px;
+      text-align: center;
+      animation: zoomIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    #halftime-overlay h2 {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      color: #ff9500;
+      text-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
+      margin-bottom: 15px;
+      letter-spacing: 1px;
+    }
+
+    #gameover-overlay h2 {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      color: #00c7be;
+      text-shadow: 0 0 20px rgba(0, 199, 190, 0.5);
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    .halftime-msg {
+      margin: 20px 0;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    .stats-table th {
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.4);
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stats-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .restart-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
+      border: none;
+      color: #ffffff;
+      padding: 16px;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 900;
+      border-radius: 12px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 5px 20px rgba(0, 122, 255, 0.35);
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .restart-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Board Container */
+    #board-container {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      border-radius: 16px;
+      background-color: #07070c;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 255, 255, 0.01);
+    }
+
+    /* Bottom Control Bar */
+    #control-bar {
+      height: 180px;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background: rgba(6, 6, 10, 0.97);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px 8px;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .control-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-radius: 14px;
+      padding: 10px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      padding: 0 4px;
+    }
+
+    .control-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      width: 100%;
+    }
+
+    /* VIRTUAL JOYSTICK LAYOUT */
+    .joystick-container {
+      border-radius: 50%;
+      border: 2px dashed var(--p-color);
+      background: rgba(var(--p-rgb), 0.02);
+      position: relative;
+      touch-action: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 10px rgba(var(--p-rgb), 0.1);
+      transition: border 0.3s;
+    }
+
+    .joystick-knob {
+      border-radius: 50%;
+      background: var(--p-color);
+      position: absolute;
+      box-shadow: 0 0 12px var(--p-color);
+      pointer-events: none;
+      transform: translate(0px, 0px);
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    /* STATUS BADGE */
+    .status-circle {
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.02);
+      border: 2px solid var(--p-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.4rem;
+      box-shadow: 0 0 10px rgba(var(--p-rgb), 0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .status-label-sub {
+      font-size: 0.6rem;
+      font-family: var(--font-display);
+      font-weight: bold;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    /* Status variants */
+    .status-circle.jail {
+      border-color: #ff2d55 !important;
+      background: rgba(255, 45, 85, 0.15) !important;
+      box-shadow: 0 0 15px rgba(255, 45, 85, 0.5) !important;
+      animation: statusBlink 1s infinite alternate;
+    }
+
+    .status-circle.shield {
+      border-color: #4cd964 !important;
+      background: rgba(76, 217, 100, 0.15) !important;
+      box-shadow: 0 0 15px rgba(76, 217, 100, 0.6) !important;
+    }
+
+    .status-circle.boost {
+      border-color: #ffcc00 !important;
+      background: rgba(255, 204, 0, 0.15) !important;
+      box-shadow: 0 0 15px rgba(255, 204, 0, 0.6) !important;
+    }
+
+    .status-circle.police {
+      border-color: #007aff !important;
+      background: rgba(0, 122, 255, 0.1) !important;
+    }
+
+    @keyframes statusBlink {
+      from {
+        opacity: 0.5;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* ROLE CONFIRMATION OVERLAYS */
+    .confirm-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(6, 6, 12, 0.96);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+      padding: 12px;
+      text-align: center;
+      transition: opacity 0.3s ease;
+    }
+
+    .confirm-title {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 900;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+
+    .confirm-emoji {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      animation: roleBounce 1.2s infinite alternate;
+    }
+
+    .confirm-btn {
+      border: none;
+      color: #ffffff;
+      padding: 8px 20px;
+      font-family: var(--font-primary);
+      font-weight: 800;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .confirm-btn:active {
+      transform: scale(0.95);
+    }
+
+    .confirm-btn.confirmed {
+      background-color: #4cd964 !important;
+      box-shadow: 0 0 12px rgba(76, 217, 100, 0.5);
+      cursor: default;
+      pointer-events: none;
+    }
+
+    @keyframes roleBounce {
+      from {
+        transform: translateY(0);
+      }
+
+      to {
+        transform: translateY(-4px);
+      }
+    }
+
+    .role-message {
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-align: center;
+      margin: 4px 0;
+      letter-spacing: 1px;
+      text-shadow: 0 0 8px currentColor;
+      animation: messagePulse 1s infinite alternate;
+    }
+
+    @keyframes messagePulse {
+      from {
+        opacity: 0.8;
+        transform: scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1.02);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- GLOBAL NAV BUTTONS -->
+  <button id="home-btn" class="nav-btn">🏠</button>
+  <button id="fullscreen-btn" class="nav-btn">⛶</button>
+
+  <!-- 1. LOBBY SCREEN -->
+  <div id="lobby-screen" class="screen active">
+    <div class="lobby-container glass-card">
+      <h1>경찰킹 도둑킹</h1>
+      <div class="sub-title">POLICE & THIEF KING</div>
+
+      <!-- Interactive Rules Container with Korean/English Tab selection -->
+      <div class="rules-container">
+        <div class="rules-header">
+          <span class="rules-title" id="rules-title-text">게임 방법</span>
+          <div class="lang-selector">
+            <button class="lang-btn active" id="lang-ko-btn">KO</button>
+            <button class="lang-btn" id="lang-en-btn">EN</button>
+          </div>
+        </div>
+        <div class="rules-col">
+          <div class="rules-content" id="rules-content-ko">
+            <p>• 경찰과 도둑 팀 대전! 1:1, 2:2, 3:3 매치만 가능합니다 (홀수 불가).</p>
+            <p>• 1라운드와 2라운드로 진행되며, 하프타임에 역할을 교대합니다.</p>
+            <p>• 경찰(👮‍♂️🦸‍♂️🕵️)은 도둑보다 처음 설정 이동속도가 1.5배 빠릅니다.</p>
+            <p>• 도둑(🦹🧟‍♀️🧌)은 느리지만 돈(💰)을 먹으면 빨라집니다 (최대 3단 가속).</p>
+            <p>• 도둑이 체포되면 5초 뒤 자기 열의 상하 중간 위치에서 부활합니다.</p>
+            <p>• 부활 직후 5초간은 무적 상태가 되며 경찰보다 빠르게 도망칠 수 있습니다.</p>
+            <p>• 제한 시간 내에 도둑을 더 많이 잡은(누적 검거 횟수가 높은) 팀이 승리합니다!</p>
+          </div>
+          <div class="rules-content" id="rules-content-en" style="display: none;">
+            <p>• Police vs Thief Team Match! Supports 1:1, 2:2, or 3:3 matches only.</p>
+            <p>• Played in 2 rounds. Teams swap roles at halftime.</p>
+            <p>• Police (👮‍♂️🦸‍♂️🕵️) start 1.5x faster than thieves.</p>
+            <p>• Thieves (🦹🧟‍♀️🧌) are slower but speed up by eating money (💰) (up to 3 stacks).</p>
+            <p>• Caught thieves respawn at the vertical center of their column after 5 seconds.</p>
+            <p>• Post-respawn grants 5s invulnerability and a speed boost to escape.</p>
+            <p>• The team with the most total captures (highest score) wins!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Number of Players -->
+      <div class="setup-section">
+        <div class="setup-label" id="setup-players-label">Players Count</div>
+        <div class="grid-options" id="player-options">
+          <button class="opt-btn" data-val="2">1:1 (2P)</button>
+          <button class="opt-btn active" data-val="4">2:2 (4P)</button>
+          <button class="opt-btn" data-val="6">3:3 (6P)</button>
+        </div>
+      </div>
+
+      <!-- Game Time Selection -->
+      <div class="setup-section">
+        <div class="setup-label" id="setup-time-label">Game Time</div>
+        <div class="grid-options-2" id="time-options">
+          <button class="opt-btn active" data-val="ta-1">1 Min (30s/R)</button>
+          <button class="opt-btn" data-val="ta-2">2 Min (60s/R)</button>
+        </div>
+      </div>
+
+      <!-- Start Button & external link -->
+      <button id="start-btn">Battle Start</button>
+      <div>
+        <a href="https://킹수학.com" target="_self" class="more-games-link">More Games</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. GAME SCREEN -->
+  <div id="game-screen" class="screen">
+    <!-- Floating Scoreboard / Timer Header -->
+    <div id="game-header">
+      <div class="team-score-badge a-score">Team A (🚨 POLICE): <span id="team-a-score-val">0</span></div>
+      <div id="timer-display">00:30</div>
+      <div class="team-score-badge b-score">Team B (🏃 THIEF): <span id="team-b-score-val">0</span></div>
+    </div>
+
+    <!-- Centered Canvas Container -->
+    <div id="board-container">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Halftime Transition Modal Card -->
+      <div id="halftime-overlay" class="glass-card">
+        <h2>공수 교대!</h2>
+        <div class="halftime-msg">
+          <p id="halftime-msg-text">1라운드가 종료되었습니다.</p>
+          <p style="color: #007aff; font-weight: bold; margin-top: 12px; font-family: var(--font-display);">GET READY
+            FOR ROUND 2!</p>
+        </div>
+        <button class="restart-btn" id="next-round-btn">Round 2 Start</button>
+      </div>
+
+      <!-- Game Over overlay modal card (centered in game screen) -->
+      <div id="gameover-overlay" class="glass-card">
+        <h2>BATTLE OVER</h2>
+        <div class="halftime-msg" id="winner-announcement" style="font-size: 1.4rem; font-weight: 800; color: #ffcc00;">
+          TEAM A WINS! 🏆
+        </div>
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Team</th>
+              <th>Captures (🚨)</th>
+              <th>Coins Eaten (💰)</th>
+              <th>Times Caught (⛓️)</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body-overlay"></tbody>
+        </table>
+        <button class="restart-btn" id="replay-btn">Replay</button>
+      </div>
+    </div>
+
+    <!-- Bottom Controls split into columns -->
+    <div id="control-bar"></div>
+  </div>
+
+  <!-- Audio and Game Logic Script -->
+  <script>
+    /* =========================================================================
+       8-BIT RETRO AUDIO SYNTHESISER (Web Audio API)
+       ========================================================================= */
+    class SoundSynth {
+      constructor() {
+        this.ctx = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playClick() {
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(150, now + 0.05);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.05);
+
+        osc.start();
+        osc.stop(now + 0.05);
+      }
+
+      playMoney() {
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.type = 'triangle';
+        // Arpeggio: C5 -> G5
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(783.99, now + 0.08);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.setValueAtTime(0.12, now + 0.08);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.22);
+
+        osc.start();
+        osc.stop(now + 0.22);
+      }
+
+      playCapture() {
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.linearRampToValueAtTime(300, now + 0.15);
+        osc.frequency.linearRampToValueAtTime(900, now + 0.3);
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+
+        osc.start();
+        osc.stop(now + 0.3);
+      }
+
+      playCountdownBeep(isStart) {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        if (isStart) {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.exponentialRampToValueAtTime(1320, now + 0.3);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+          osc.start();
+          osc.stop(now + 0.3);
+        } else {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.linearRampToValueAtTime(0.001, now + 0.12);
+          osc.start();
+          osc.stop(now + 0.12);
+        }
+      }
+
+      playTimeOver() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.setValueAtTime(400, now + 0.1);
+        osc.frequency.setValueAtTime(600, now + 0.2);
+        osc.frequency.setValueAtTime(400, now + 0.3);
+        osc.frequency.setValueAtTime(600, now + 0.4);
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.55);
+
+        osc.start();
+        osc.stop(now + 0.55);
+      }
+
+      playRespawn() {
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.28);
+
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.28);
+
+        osc.start();
+        osc.stop(now + 0.28);
+      }
+
+      playSwap() {
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(293.66, now + 0.15);
+        osc.frequency.setValueAtTime(440, now + 0.3);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.45);
+
+        osc.start();
+        osc.stop(now + 0.45);
+      }
+
+      playGameOver() {
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+        osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.65);
+
+        osc.start();
+        osc.stop(now + 0.65);
+      }
+    }
+
+    const sound = new SoundSynth();
+
+    /* =========================================================================
+       GAME CONSTANTS & CONFIGURATION
+       ========================================================================= */
+    const POLICE_EMOJIS = ['👮‍♂️', '🦸‍♂️', '🕵️'];
+    const THIEF_EMOJIS = ['🦹', '🧟‍♀️', '🧌'];
+
+    // Player Colors, RGB Strings for transparent backgrounds, and default keyboard layout configuration
+    const PLAYER_DEFAULTS = [
+      { id: 1, color: '#007aff', rgb: '0, 122, 255', text: '#ffffff', keyboard: { up: 'KeyW', left: 'KeyA', down: 'KeyS', right: 'KeyD' } },
+      { id: 2, color: '#ff2d55', rgb: '255, 45, 85', text: '#ffffff', keyboard: { up: 'ArrowUp', left: 'ArrowLeft', down: 'ArrowDown', right: 'ArrowRight' } },
+      { id: 3, color: '#00c7be', rgb: '0, 199, 190', text: '#ffffff', keyboard: { up: 'KeyI', left: 'KeyJ', down: 'KeyK', right: 'KeyL' } },
+      { id: 4, color: '#ff9500', rgb: '255, 149, 0', text: '#ffffff', keyboard: { up: 'KeyT', left: 'KeyF', down: 'KeyG', right: 'KeyH' } },
+      { id: 5, color: '#af52de', rgb: '175, 82, 222', text: '#ffffff', keyboard: { up: 'KeyO', left: 'KeyK', down: 'KeyL', right: 'Semicolon' } },
+      { id: 6, color: '#ffcc00', rgb: '255, 204, 0', text: '#000000', keyboard: { up: 'Numpad8', left: 'Numpad4', down: 'Numpad5', right: 'Numpad6' } }
+    ];
+
+    let GRID_COLS = 50;
+    let GRID_ROWS = 25;
+
+    /* =========================================================================
+       STATE VARIABLES
+       ========================================================================= */
+    let currentScreen = 'lobby';
+    let playerCount = 4;
+    let gameDurationSetting = 'ta-1'; // 'ta-1' = 1 Min (30s per round), 'ta-2' = 2 Min (60s per round)
+
+    let canvas, ctx;
+    let animationFrameId = null;
+    let lastTime = 0;
+
+    let roundDuration = 30; // seconds
+    let timeRemaining = 30;
+    let roundInterval = null;
+
+    let currentRound = 1;
+    let policeTeam = 'teamA'; // 'teamA' or 'teamB'
+    let teamScores = { teamA: 0, teamB: 0 }; // capture counts as police
+
+    let players = [];
+    let moneyItems = [];
+    let obstacles = [];
+    let particles = [];
+    let activeKeys = {};
+    let movingCars = [];
+
+    let isWaitingForConfirmation = false; // Individual role confirmation overlay state
+    let isCountdown = false;
+    let countdownVal = 3;
+    let countdownText = "";
+
+    const PLAYER_RADIUS = 22; // 44px diameter (quite large)
+
+    /* =========================================================================
+       DOM ELEMENTS & MENU CONTROLS
+       ========================================================================= */
+    document.addEventListener('DOMContentLoaded', () => {
+      canvas = document.getElementById('game-canvas');
+      ctx = canvas.getContext('2d');
+
+      window.addEventListener('resize', resizeCanvas);
+
+      // Keyboard input listeners
+      window.addEventListener('keydown', (e) => {
+        activeKeys[e.code] = true;
+      });
+      window.addEventListener('keyup', (e) => {
+        activeKeys[e.code] = false;
+      });
+
+      setupLobbyOptions('player-options', (val) => {
+        playerCount = parseInt(val);
+      });
+
+      setupLobbyOptions('time-options', (val) => {
+        gameDurationSetting = val;
+      });
+
+      document.getElementById('start-btn').addEventListener('click', () => {
+        sound.init();
+        sound.playClick();
+        initGame();
+      });
+
+      document.getElementById('home-btn').addEventListener('click', () => {
+        sound.playClick();
+        switchScreen('lobby');
+      });
+
+      document.getElementById('fullscreen-btn').addEventListener('click', () => {
+        sound.playClick();
+        toggleFullscreen();
+      });
+
+      // Next Round Button for halftime role swap
+      document.getElementById('next-round-btn').addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        sound.playClick();
+        document.getElementById('halftime-overlay').style.display = 'none';
+        startRound2();
+      });
+
+      // Replay button in gameover card
+      document.getElementById('replay-btn').addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        sound.playClick();
+        document.getElementById('gameover-overlay').style.display = 'none';
+        initGame();
+      });
+
+      // Interactive Rules Language Toggle logic
+      document.getElementById('lang-ko-btn').addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        sound.playClick();
+        document.getElementById('lang-ko-btn').classList.add('active');
+        document.getElementById('lang-en-btn').classList.remove('active');
+        document.getElementById('rules-content-ko').style.display = 'block';
+        document.getElementById('rules-content-en').style.display = 'none';
+        document.getElementById('rules-title-text').textContent = '게임 방법';
+        document.getElementById('setup-players-label').textContent = '인원 수 설정';
+        document.getElementById('setup-time-label').textContent = '게임 시간 설정';
+      });
+
+      document.getElementById('lang-en-btn').addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        sound.playClick();
+        document.getElementById('lang-en-btn').classList.add('active');
+        document.getElementById('lang-ko-btn').classList.remove('active');
+        document.getElementById('rules-content-en').style.display = 'block';
+        document.getElementById('rules-content-ko').style.display = 'none';
+        document.getElementById('rules-title-text').textContent = 'Game Rules';
+        document.getElementById('setup-players-label').textContent = 'Players Count';
+        document.getElementById('setup-time-label').textContent = 'Game Time';
+      });
+    });
+
+    function toggleFullscreen() {
+      const doc = window.document;
+      const docEl = doc.documentElement;
+
+      const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+      const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+      if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        if (requestFullScreen) {
+          requestFullScreen.call(docEl).catch(err => {
+            console.log("Error enabling fullscreen:", err);
+          });
+        }
+      } else {
+        if (cancelFullScreen) {
+          cancelFullScreen.call(doc);
+        }
+      }
+    }
+
+    function setupLobbyOptions(containerId, callback) {
+      const container = document.getElementById(containerId);
+      const buttons = container.querySelectorAll('.opt-btn');
+      buttons.forEach(btn => {
+        const selectAction = (e) => {
+          e.preventDefault();
+          buttons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          sound.playClick();
+          callback(btn.dataset.val);
+        };
+        btn.addEventListener('pointerdown', selectAction);
+      });
+    }
+
+    function switchScreen(screenId) {
+      currentScreen = screenId;
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(`${screenId}-screen`).classList.add('active');
+
+      const homeBtn = document.getElementById('home-btn');
+      if (homeBtn) {
+        homeBtn.style.display = (screenId === 'lobby') ? 'none' : 'flex';
+      }
+
+      if (screenId === 'game') {
+        document.getElementById('gameover-overlay').style.display = 'none';
+        document.getElementById('halftime-overlay').style.display = 'none';
+        resizeCanvas();
+      } else {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+        clearInterval(roundInterval);
+      }
+    }
+
+    /* =========================================================================
+       CANVAS RESIZE & SCALING FOR WIDESCREEN SUPPORT
+       ========================================================================= */
+    let cellSize = 20;
+    let boardOffsetX = 0;
+    let boardOffsetY = 0;
+    let boardWidth = 0;
+    let boardHeight = 0;
+
+    function resizeCanvas() {
+      const container = document.getElementById('board-container');
+      if (!container || container.clientWidth === 0) return;
+
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.scale(dpr, dpr);
+
+      GRID_ROWS = 25;
+      cellSize = Math.floor(h / GRID_ROWS);
+      GRID_COLS = Math.floor(w / cellSize);
+      if (GRID_COLS < 10) GRID_COLS = 10;
+
+      boardWidth = GRID_COLS * cellSize;
+      boardHeight = GRID_ROWS * cellSize;
+
+      boardOffsetX = Math.floor((w - boardWidth) / 2);
+      boardOffsetY = Math.floor((h - boardHeight) / 2);
+
+      generateObstacles();
+    }
+
+    /* =========================================================================
+       OBSTACLE LAYOUT GENERATOR (11 Large and Vivid Obstacles)
+       ========================================================================= */
+    function generateObstacles() {
+      obstacles = [];
+      if (boardWidth === 0) return;
+
+      const wCenter = boardWidth / 2;
+      const hCenter = boardHeight / 2;
+
+      // 1. Center barrier (Large)
+      obstacles.push({ x: wCenter - 45, y: hCenter - 45, w: 90, h: 90, emoji: '🧱' });
+
+      // 2. Inner-middle columns (4 obstacles)
+      const wDist1 = boardWidth * 0.22;
+      const hDist1 = boardHeight * 0.25;
+      obstacles.push({ x: wCenter - wDist1 - 35, y: hCenter - hDist1 - 35, w: 70, h: 70, emoji: '🌳' });
+      obstacles.push({ x: wCenter + wDist1 - 35, y: hCenter - hDist1 - 35, w: 70, h: 70, emoji: '🌳' });
+      obstacles.push({ x: wCenter - wDist1 - 35, y: hCenter + hDist1 - 35, w: 70, h: 70, emoji: '🌳' });
+      obstacles.push({ x: wCenter + wDist1 - 35, y: hCenter + hDist1 - 35, w: 70, h: 70, emoji: '🌳' });
+
+      // 3. Outer-middle columns (4 obstacles)
+      const wDist2 = boardWidth * 0.38;
+      const hDist2 = boardHeight * 0.25;
+      obstacles.push({ x: wCenter - wDist2 - 35, y: hCenter - hDist2 - 35, w: 70, h: 70, emoji: '🧱' });
+      obstacles.push({ x: wCenter + wDist2 - 35, y: hCenter - hDist2 - 35, w: 70, h: 70, emoji: '🧱' });
+      obstacles.push({ x: wCenter - wDist2 - 35, y: hCenter + hDist2 - 35, w: 70, h: 70, emoji: '🧱' });
+      obstacles.push({ x: wCenter + wDist2 - 35, y: hCenter + hDist2 - 35, w: 70, h: 70, emoji: '🧱' });
+
+      // 4. Center-left and Center-right blockades (2 obstacles)
+      obstacles.push({ x: 80, y: hCenter - 50, w: 35, h: 100, emoji: '🧱' });
+      obstacles.push({ x: boardWidth - 115, y: hCenter - 50, w: 35, h: 100, emoji: '🧱' });
+    }
+
+    function findSafeHorizontalPaths(carH) {
+      const paths = [];
+      for (let y = carH + 15; y < boardHeight - carH - 15; y += 10) {
+        let overlap = false;
+        for (const obs of obstacles) {
+          if (!(y + carH / 2 + 10 < obs.y || y - carH / 2 - 10 > obs.y + obs.h)) {
+            overlap = true;
+            break;
+          }
+        }
+        if (!overlap) {
+          if (paths.length === 0 || Math.abs(paths[0] - y) > 100) {
+            paths.push(y);
+            if (paths.length >= 2) break;
+          }
+        }
+      }
+      if (paths.length < 1) paths.push(boardHeight * 0.12);
+      if (paths.length < 2) paths.push(boardHeight * 0.88);
+      return paths;
+    }
+
+    function findSafeVerticalPath(carW) {
+      for (let x = Math.floor(boardWidth * 0.25); x < Math.floor(boardWidth * 0.75); x += 10) {
+        let overlap = false;
+        for (const obs of obstacles) {
+          if (!(x + carW / 2 + 10 < obs.x || x - carW / 2 - 10 > obs.x + obs.w)) {
+            overlap = true;
+            break;
+          }
+        }
+        if (!overlap) {
+          return x;
+        }
+      }
+      return boardWidth * 0.35;
+    }
+
+    /* =========================================================================
+       PARTICLE SYSTEM FOR CAPTURE & COIN EFFECTS
+       ========================================================================= */
+    function spawnParticles(x, y, count, type) {
+      const optimizedCount = Math.max(1, Math.floor(count * 0.5));
+      const emojis = type === 'money' ? ['💰', '✨', '🪙'] : ['⛓️', '💥', '🔒', '🚨'];
+      for (let i = 0; i < optimizedCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const force = 2 + Math.random() * 4;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * force,
+          vy: Math.sin(angle) * force,
+          emoji: emojis[Math.floor(Math.random() * emojis.length)],
+          life: 400 + Math.random() * 200,
+          maxLife: 600,
+          size: 14 + Math.random() * 10
+        });
+      }
+    }
+
+    function updateParticles(dt) {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+        p.life -= dt;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+    }
+
+    function renderParticles() {
+      let lastFont = "";
+      particles.forEach(p => {
+        ctx.save();
+        const alpha = p.life / p.maxLife;
+        ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+        const size = p.size < 20 ? 16 : 24;
+        const fontStr = `${size}px "Segoe UI Emoji", "Apple Color Emoji", Arial, sans-serif`;
+        if (lastFont !== fontStr) {
+          ctx.font = fontStr;
+          lastFont = fontStr;
+        }
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.emoji, p.x, p.y);
+        ctx.restore();
+      });
+    }
+
+    /* =========================================================================
+       GAME INITIALISATION & TEAM ROLE SELECTION
+       ========================================================================= */
+    function initGame() {
+      currentRound = 1;
+      teamScores = { teamA: 0, teamB: 0 };
+      policeTeam = Math.random() < 0.5 ? 'teamA' : 'teamB';
+
+      switchScreen('game');
+      startRound();
+    }
+
+    function startRound() {
+      moneyItems = [];
+      particles = [];
+
+      roundDuration = (gameDurationSetting === 'ta-1') ? 30 : 60;
+      timeRemaining = roundDuration;
+
+      clearInterval(roundInterval);
+      document.getElementById('timer-display').textContent = 'READY';
+
+      isWaitingForConfirmation = true;
+      isCountdown = false;
+      countdownText = "";
+
+      assignRoles();
+      buildControlBar();
+      updateHeaderUI();
+
+      for (let m = 0; m < 15; m++) {
+        spawnMoneyItem();
+      }
+
+      const hPaths = findSafeHorizontalPaths(38);
+      const vPath = findSafeVerticalPath(38);
+
+      // Initialize moving cars using safe paths (no overlap, no collision with wall obstacles)
+      movingCars = [
+        { x: -50, y: hPaths[0], w: 72, h: 38, vx: 2.2, vy: 0, emoji: '🚗', direction: 'right' },
+        { x: boardWidth + 50, y: hPaths[1], w: 72, h: 38, vx: -2.2, vy: 0, emoji: '🚕', direction: 'left' },
+        { x: vPath, y: -50, w: 38, h: 72, vx: 0, vy: 1.8, emoji: '🏎️', direction: 'down' }
+      ];
+
+      // Initialise player starting positions
+      const policePlayers = players.filter(p => p.role === 'police');
+      policePlayers.forEach((p, idx) => {
+        const spacingWidth = boardWidth / (policePlayers.length + 1);
+        p.x = boardOffsetX + spacingWidth * (idx + 1);
+        p.y = boardOffsetY + 50; // spawn at the top
+        p.angle = Math.PI / 2; // facing down
+      });
+
+      const thiefPlayers = players.filter(p => p.role === 'thief');
+      thiefPlayers.forEach((p, idx) => {
+        // Spawn Thief at the vertical center of their column
+        const colWidth = boardWidth / playerCount;
+        p.x = boardOffsetX + colWidth * (p.id - 0.5);
+        p.y = boardOffsetY + boardHeight / 2; // Spawn at vertical center!
+        p.angle = -Math.PI / 2; // facing up
+      });
+
+      lastTime = performance.now();
+      if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(gameLoop);
+      }
+    }
+
+    function assignRoles() {
+      const isTeamAPolice = (policeTeam === 'teamA');
+      players = [];
+
+      for (let i = 1; i <= playerCount; i++) {
+        const config = PLAYER_DEFAULTS[i - 1];
+        const isTeamA = (i % 2 !== 0); // P1, P3, P5 are Team A
+
+        const role = isTeamA
+          ? (isTeamAPolice ? 'police' : 'thief')
+          : (isTeamAPolice ? 'thief' : 'police');
+
+        players.push({
+          id: i,
+          team: isTeamA ? 'teamA' : 'teamB',
+          role: role,
+          color: config.color,
+          rgb: config.rgb,
+          text: config.text,
+          keyboard: config.keyboard,
+
+          x: 0,
+          y: 0,
+          angle: 0,
+          isDead: false,
+          respawnTimer: 0,
+          invulnerableTimer: 0,
+          speedBoostTimer: 0,
+          speedBoostCount: 0,
+
+          joystickActive: false,
+          isJoystickDragging: false,
+          isConfirmed: false,
+
+          // Stats reset per match
+          stats: (currentRound === 1) ? { captures: 0, coinsEaten: 0, deaths: 0 } : null
+        });
+      }
+
+      if (currentRound === 2) {
+        const prevPlayers = window.round1PlayersData || [];
+        players.forEach(p => {
+          const matched = prevPlayers.find(old => old.id === p.id);
+          p.stats = matched ? matched.stats : { captures: 0, coinsEaten: 0, deaths: 0 };
+        });
+      }
+
+      const policePlayers = players.filter(p => p.role === 'police');
+      policePlayers.forEach((p, idx) => {
+        p.emoji = POLICE_EMOJIS[idx % POLICE_EMOJIS.length];
+      });
+
+      const thiefPlayers = players.filter(p => p.role === 'thief');
+      thiefPlayers.forEach((p, idx) => {
+        p.emoji = THIEF_EMOJIS[idx % THIEF_EMOJIS.length];
+      });
+    }
+
+    function startRoundTimer() {
+      updateTimerDisplay();
+      clearInterval(roundInterval);
+      roundInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+          clearInterval(roundInterval);
+          handleRoundEnd();
+        }
+      }, 1000);
+    }
+
+    function checkAllConfirmations() {
+      const allReady = players.every(p => p.isConfirmed);
+      if (allReady) {
+        players.forEach(p => {
+          const overlay = document.getElementById(`confirm-overlay-p${p.id}`);
+          if (overlay) {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+              overlay.style.display = 'none';
+            }, 300);
+          }
+        });
+
+        startCountdown();
+      }
+    }
+
+    function startCountdown() {
+      isWaitingForConfirmation = false;
+      isCountdown = true;
+      countdownVal = 3;
+      countdownText = "3";
+
+      sound.playCountdownBeep(false);
+
+      const countdownInterval = setInterval(() => {
+        countdownVal--;
+        if (countdownVal === 2) {
+          countdownText = "2";
+          sound.playCountdownBeep(false);
+        } else if (countdownVal === 1) {
+          countdownText = "1";
+          sound.playCountdownBeep(false);
+        } else if (countdownVal === 0) {
+          countdownText = "시작!";
+          sound.playCountdownBeep(true);
+
+          isCountdown = false;
+          clearInterval(countdownInterval);
+          lastTime = performance.now();
+          startRoundTimer();
+
+          setTimeout(() => {
+            countdownText = "";
+          }, 800);
+        }
+      }, 1000);
+    }
+
+    function spawnMoneyItem() {
+      let attempts = 0;
+      let rx = 0, ry = 0;
+      const radius = 14;
+
+      while (attempts < 100) {
+        rx = 30 + Math.random() * (boardWidth - 60);
+        ry = 30 + Math.random() * (boardHeight - 60);
+
+        let overlap = false;
+        for (const obs of obstacles) {
+          const ox = obs.x;
+          const oy = obs.y;
+          const ow = obs.w;
+          const oh = obs.h;
+
+          const cx = Math.max(ox, Math.min(rx, ox + ow));
+          const cy = Math.max(oy, Math.min(ry, oy + oh));
+          const dist = Math.sqrt((rx - cx) * (rx - cx) + (ry - cy) * (ry - cy));
+          if (dist < radius + 15) {
+            overlap = true;
+            break;
+          }
+        }
+
+        if (!overlap) {
+          for (const m of moneyItems) {
+            const dist = Math.sqrt((rx - m.x) * (rx - m.x) + (ry - m.y) * (ry - m.y));
+            if (dist < 40) {
+              overlap = true;
+              break;
+            }
+          }
+        }
+
+        if (!overlap) break;
+        attempts++;
+      }
+
+      moneyItems.push({
+        x: rx,
+        y: ry,
+        radius: radius
+      });
+    }
+
+    /* =========================================================================
+       DYNAMIC CONTROL BAR BUILDER (With Confirmation buttons)
+       ========================================================================= */
+    function buildControlBar() {
+      const ctrlBar = document.getElementById('control-bar');
+      ctrlBar.innerHTML = '';
+
+      let joySize = 90;
+      let statusSize = 58;
+      if (playerCount === 6) {
+        joySize = 75;
+        statusSize = 48;
+      } else if (playerCount === 2) {
+        joySize = 105;
+        statusSize = 70;
+      }
+
+      for (let i = 1; i <= playerCount; i++) {
+        const player = players.find(p => p.id === i);
+        if (!player) continue;
+
+        const isPolice = player.role === 'police';
+        const roleColor = isPolice ? '#007aff' : '#ff2d55';
+        const roleRgb = isPolice ? '0, 122, 255' : '255, 45, 85';
+
+        const col = document.createElement('div');
+        col.className = 'control-column glass-card';
+        col.style.border = `2px solid ${roleColor}`;
+        col.style.background = `rgba(${roleRgb}, 0.03)`;
+        col.id = `ctrl-col-p${i}`;
+
+        const teamLabel = player.team === 'teamA' ? 'A팀' : 'B팀';
+        const roleText = isPolice ? '경찰 🚨' : '도둑 🏃';
+
+        const header = document.createElement('div');
+        header.className = 'control-header';
+        header.style.color = roleColor;
+        header.innerHTML = `
+          <span>P${i} (${teamLabel}) - <b>${roleText}</b></span>
+          <span id="ctrl-stats-p${i}">${isPolice ? '검거: 0' : '속도: 1.8'}</span>
+        `;
+        col.appendChild(header);
+
+        const roleMessage = document.createElement('div');
+        roleMessage.className = 'role-message';
+        roleMessage.style.color = isPolice ? '#00e5ff' : '#ff5252';
+        roleMessage.textContent = isPolice ? '도둑을 잡아요!' : '도망치세요!';
+        col.appendChild(roleMessage);
+
+        const body = document.createElement('div');
+        body.className = 'control-body';
+
+        // Joystick UI build
+        const joyContainer = document.createElement('div');
+        joyContainer.className = 'joystick-container';
+        joyContainer.id = `joy-container-p${i}`;
+        joyContainer.style.width = `${joySize}px`;
+        joyContainer.style.height = `${joySize}px`;
+        joyContainer.style.setProperty('--p-color', roleColor);
+        joyContainer.style.setProperty('--p-rgb', roleRgb);
+
+        const joyKnobDiv = document.createElement('div');
+        joyKnobDiv.className = 'joystick-knob';
+        joyKnobDiv.id = `joy-knob-p${i}`;
+        joyKnobDiv.style.width = `${joySize * 0.35}px`;
+        joyKnobDiv.style.height = `${joySize * 0.35}px`;
+        joyKnobDiv.style.backgroundColor = roleColor;
+        joyKnobDiv.style.boxShadow = `0 0 12px ${roleColor}`;
+
+        joyContainer.appendChild(joyKnobDiv);
+
+        // Status Card build
+        const statusCard = document.createElement('div');
+        statusCard.className = `status-circle ${isPolice ? 'police' : 'normal'}`;
+        statusCard.id = `status-circle-p${i}`;
+        statusCard.style.width = `${statusSize}px`;
+        statusCard.style.height = `${statusSize}px`;
+        statusCard.style.setProperty('--p-color', roleColor);
+        statusCard.style.setProperty('--p-rgb', roleRgb);
+        statusCard.innerHTML = `
+          <span class="status-icon" id="status-icon-p${i}">${isPolice ? player.emoji : '🏃'}</span>
+          <span class="status-label-sub" id="status-label-p${i}">${isPolice ? '추격' : '대기'}</span>
+        `;
+
+        body.appendChild(joyContainer);
+        body.appendChild(statusCard);
+        col.appendChild(body);
+
+        // Confirmation overlay (for student readiness)
+        const confirmOverlay = document.createElement('div');
+        confirmOverlay.className = 'confirm-overlay';
+        confirmOverlay.id = `confirm-overlay-p${player.id}`;
+
+        const roleLabelKr = isPolice ? '경찰 🚨' : '도둑 🏃';
+        confirmOverlay.innerHTML = `
+          <div class="confirm-title" style="color: ${roleColor}">${teamLabel} - ${roleLabelKr}</div>
+          <div class="confirm-emoji">${player.emoji}</div>
+          <button class="confirm-btn" id="confirm-btn-p${player.id}" style="background-color: ${roleColor}">역할 확인</button>
+        `;
+
+        const confirmBtn = confirmOverlay.querySelector('.confirm-btn');
+        confirmBtn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          sound.playClick();
+          player.isConfirmed = true;
+          confirmBtn.textContent = '확인 완료 ✓';
+          confirmBtn.className = 'confirm-btn confirmed';
+          confirmBtn.style.backgroundColor = '#4cd964';
+          checkAllConfirmations();
+        });
+
+        col.appendChild(confirmOverlay);
+        ctrlBar.appendChild(col);
+
+        setupJoystickEvents(i, joyContainer, joyKnobDiv, joySize);
+      }
+    }
+
+    function setupJoystickEvents(playerId, container, knob, joySize) {
+      let active = false;
+      let pointerId = null;
+      let startX = 0;
+      let startY = 0;
+
+      container.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        sound.init();
+        active = true;
+        pointerId = e.pointerId;
+        container.setPointerCapture(e.pointerId);
+
+        startX = e.clientX;
+        startY = e.clientY;
+
+        updateJoystickDrag(e, playerId, container, knob, startX, startY, (newX, newY) => {
+          startX = newX;
+          startY = newY;
+        });
+      });
+
+      container.addEventListener('pointermove', (e) => {
+        if (active && e.pointerId === pointerId) {
+          e.preventDefault();
+          updateJoystickDrag(e, playerId, container, knob, startX, startY, (newX, newY) => {
+            startX = newX;
+            startY = newY;
+          });
+        }
+      });
+
+      const stopDrag = (e) => {
+        if (active && e.pointerId === pointerId) {
+          e.preventDefault();
+          active = false;
+          pointerId = null;
+          knob.style.transform = 'translate(0px, 0px)';
+
+          const player = players.find(p => p.id === playerId);
+          if (player) {
+            player.joystickActive = false;
+            player.isJoystickDragging = false;
+          }
+        }
+      };
+
+      container.addEventListener('pointerup', stopDrag);
+      container.addEventListener('pointercancel', stopDrag);
+      container.addEventListener('pointerleave', stopDrag);
+    }
+
+    function updateJoystickDrag(e, playerId, container, knob, startX, startY, setCenter) {
+      let dx = e.clientX - startX;
+      let dy = e.clientY - startY;
+
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxDrag = container.clientWidth / 2 - knob.clientWidth / 2;
+
+      const angle = Math.atan2(dy, dx);
+
+      let knobX = dx;
+      let knobY = dy;
+      if (dist > maxDrag) {
+        knobX = Math.cos(angle) * maxDrag;
+        knobY = Math.sin(angle) * maxDrag;
+        setCenter(e.clientX - knobX, e.clientY - knobY);
+      }
+
+      knob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+
+      const player = players.find(p => p.id === playerId);
+      if (player && !player.isDead) {
+        if (dist > 5) {
+          player.angle = angle;
+          player.joystickActive = true;
+          player.isJoystickDragging = true;
+        } else {
+          player.joystickActive = false;
+        }
+      }
+    }
+
+    function updateHeaderUI() {
+      const isTeamAPolice = (policeTeam === 'teamA');
+
+      const aBadge = document.getElementById('team-a-score-val');
+      const bBadge = document.getElementById('team-b-score-val');
+      const aContainer = aBadge.parentElement;
+      const bContainer = bBadge.parentElement;
+
+      aBadge.textContent = teamScores.teamA;
+      bBadge.textContent = teamScores.teamB;
+
+      if (isTeamAPolice) {
+        aContainer.className = 'team-score-badge a-score active-police';
+        aContainer.innerHTML = `A팀 (🚨 경찰): <span id="team-a-score-val">${teamScores.teamA}</span>`;
+
+        bContainer.className = 'team-score-badge b-score';
+        bContainer.innerHTML = `B팀 (🏃 도둑): <span id="team-b-score-val">${teamScores.teamB}</span>`;
+      } else {
+        aContainer.className = 'team-score-badge a-score';
+        aContainer.innerHTML = `A팀 (🏃 도둑): <span id="team-a-score-val">${teamScores.teamA}</span>`;
+
+        bContainer.className = 'team-score-badge b-score active-police';
+        bContainer.innerHTML = `B팀 (🚨 경찰): <span id="team-b-score-val">${teamScores.teamB}</span>`;
+      }
+    }
+
+    function updateTimerDisplay() {
+      if (isWaitingForConfirmation) {
+        document.getElementById('timer-display').textContent = 'READY';
+        return;
+      }
+      const mins = Math.floor(timeRemaining / 60);
+      const secs = timeRemaining % 60;
+      const strMins = String(mins).padStart(2, '0');
+      const strSecs = String(secs).padStart(2, '0');
+      document.getElementById('timer-display').textContent = `${strMins}:${strSecs}`;
+    }
+
+    /* =========================================================================
+       CORE GAME LOOP (60FPS DELTA TIME DRIVEN)
+       ========================================================================= */
+    function gameLoop(time) {
+      if (currentScreen !== 'game') return;
+      animationFrameId = requestAnimationFrame(gameLoop);
+
+      if (!lastTime) lastTime = time;
+      let dt = time - lastTime;
+      lastTime = time;
+
+      if (dt > 100) dt = 100;
+
+      updateGame(dt);
+      renderGame();
+    }
+
+    /* =========================================================================
+       GAME STATE UPDATES (MOVEMENT, COLLISIONS, RESPAWNS)
+       ========================================================================= */
+    function updateGame(dt) {
+      if (isWaitingForConfirmation || isCountdown) {
+        updateParticles(dt);
+        return;
+      }
+
+      // 0. Update moving cars positions
+      movingCars.forEach(car => {
+        if (car.direction === 'right' || car.direction === 'left') {
+          car.x += car.vx;
+          if (car.vx > 0 && car.x > boardWidth + car.w) car.x = -car.w;
+          if (car.vx < 0 && car.x < -car.w) car.x = boardWidth + car.w;
+        } else {
+          car.y += car.vy;
+          if (car.vy > 0 && car.y > boardHeight + car.h) car.y = -car.h;
+          if (car.vy < 0 && car.y < -car.h) car.y = boardHeight + car.h;
+        }
+      });
+
+      // 1. Keyboard Inputs handling for all players
+      players.forEach(p => {
+        if (p.isDead) return;
+
+        let kx = 0;
+        let ky = 0;
+        if (p.keyboard) {
+          if (activeKeys[p.keyboard.up]) ky -= 1;
+          if (activeKeys[p.keyboard.down]) ky += 1;
+          if (activeKeys[p.keyboard.left]) kx -= 1;
+          if (activeKeys[p.keyboard.right]) kx += 1;
+        }
+
+        if (kx !== 0 || ky !== 0) {
+          p.angle = Math.atan2(ky, kx);
+          p.joystickActive = true;
+
+          const knob = document.getElementById(`joy-knob-p${p.id}`);
+          const container = document.getElementById(`joy-container-p${p.id}`);
+          if (knob && container) {
+            const maxDrag = container.clientWidth / 2 - knob.clientWidth / 2;
+            const knobX = Math.cos(p.angle) * maxDrag;
+            const knobY = Math.sin(p.angle) * maxDrag;
+            knob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+          }
+        } else if (!p.isJoystickDragging) {
+          p.joystickActive = false;
+          const knob = document.getElementById(`joy-knob-p${p.id}`);
+          if (knob) knob.style.transform = 'translate(0px, 0px)';
+        }
+      });
+
+      // 2. Process active timers and stats
+      players.forEach(p => {
+        if (p.role === 'thief') {
+          if (p.isDead) {
+            p.respawnTimer -= dt;
+            if (p.respawnTimer <= 0) {
+              respawnThief(p);
+            }
+          }
+          if (p.invulnerableTimer > 0) {
+            p.invulnerableTimer -= dt;
+            if (p.invulnerableTimer < 0) p.invulnerableTimer = 0;
+          }
+          if (p.speedBoostTimer > 0) {
+            p.speedBoostTimer -= dt;
+            if (p.speedBoostTimer <= 0) {
+              p.speedBoostTimer = 0;
+              p.speedBoostCount = 0;
+            }
+          }
+        }
+        updatePlayerHUD(p);
+      });
+
+      // 3. Player Movement & sliding physics
+      players.forEach(p => {
+        if (p.isDead) return;
+
+        let speed = 0;
+        if (p.role === 'police') {
+          speed = 2.7;
+        } else {
+          if (p.invulnerableTimer > 0) {
+            speed = 3.2;
+          } else {
+            let boostRatio = 1.0;
+            if (p.speedBoostTimer > 0) {
+              boostRatio += p.speedBoostCount * 0.4;
+            }
+            speed = 1.8 * boostRatio;
+          }
+        }
+
+        // [1] Apply keyboard/joystick movement input first
+        if (p.joystickActive) {
+          p.x += Math.cos(p.angle) * speed;
+          p.y += Math.sin(p.angle) * speed;
+        }
+
+        // [2] Solve collision with moving cars (push the player)
+        movingCars.forEach(car => {
+          const ox = boardOffsetX + car.x - car.w / 2;
+          const oy = boardOffsetY + car.y - car.h / 2;
+          const ow = car.w;
+          const oh = car.h;
+
+          const cx = Math.max(ox, Math.min(p.x, ox + ow));
+          const cy = Math.max(oy, Math.min(p.y, oy + oh));
+
+          const dx = p.x - cx;
+          const dy = p.y - cy;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < PLAYER_RADIUS * PLAYER_RADIUS) {
+            const dist = Math.sqrt(distSq);
+            if (dist === 0) {
+              if (car.direction === 'right') p.x += 2;
+              else if (car.direction === 'left') p.x -= 2;
+              else if (car.direction === 'down') p.y += 2;
+              else if (car.direction === 'up') p.y -= 2;
+            } else {
+              const overlap = PLAYER_RADIUS - dist;
+              p.x += (dx / dist) * overlap;
+              p.y += (dy / dist) * overlap;
+            }
+          }
+        });
+
+        // [3] Solve collision with wall obstacles (ensures player never gets pushed inside walls)
+        obstacles.forEach(obs => {
+          const ox = boardOffsetX + obs.x;
+          const oy = boardOffsetY + obs.y;
+          const ow = obs.w;
+          const oh = obs.h;
+
+          const cx = Math.max(ox, Math.min(p.x, ox + ow));
+          const cy = Math.max(oy, Math.min(p.y, oy + oh));
+
+          const dx = p.x - cx;
+          const dy = p.y - cy;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < PLAYER_RADIUS * PLAYER_RADIUS) {
+            const dist = Math.sqrt(distSq);
+            if (dist === 0) {
+              p.y = oy - PLAYER_RADIUS;
+            } else {
+              const overlap = PLAYER_RADIUS - dist;
+              p.x += (dx / dist) * overlap;
+              p.y += (dy / dist) * overlap;
+            }
+          }
+        });
+
+        // [4] Bound checking (keep player on the board)
+        const minX = boardOffsetX + PLAYER_RADIUS;
+        const maxX = boardOffsetX + boardWidth - PLAYER_RADIUS;
+        const minY = boardOffsetY + PLAYER_RADIUS;
+        const maxY = boardOffsetY + boardHeight - PLAYER_RADIUS;
+
+        if (p.x < minX) p.x = minX;
+        if (p.x > maxX) p.x = maxX;
+        if (p.y < minY) p.y = minY;
+        if (p.y > maxY) p.y = maxY;
+      });
+
+      // 4. Money Eating Event Checker
+      players.forEach(p => {
+        if (p.isDead || p.role !== 'thief') return;
+
+        for (let i = moneyItems.length - 1; i >= 0; i--) {
+          const m = moneyItems[i];
+          const actualX = boardOffsetX + m.x;
+          const actualY = boardOffsetY + m.y;
+
+          const dist = Math.sqrt((p.x - actualX) * (p.x - actualX) + (p.y - actualY) * (p.y - actualY));
+          if (dist < PLAYER_RADIUS + m.radius) {
+            p.stats.coinsEaten++;
+            p.speedBoostTimer = 5000;
+            p.speedBoostCount = Math.min(3, (p.speedBoostCount || 0) + 1);
+
+            spawnParticles(actualX, actualY, 10, 'money');
+            sound.playMoney();
+
+            moneyItems.splice(i, 1);
+            spawnMoneyItem();
+          }
+        }
+      });
+
+      // 5. Police Chase Tagging Event Checker
+      const police = players.filter(p => !p.isDead && p.role === 'police');
+      const thieves = players.filter(p => !p.isDead && p.role === 'thief');
+
+      police.forEach(cop => {
+        thieves.forEach(thief => {
+          if (thief.invulnerableTimer > 0) return;
+
+          const dist = Math.sqrt((cop.x - thief.x) * (cop.x - thief.x) + (cop.y - thief.y) * (cop.y - thief.y));
+          if (dist < PLAYER_RADIUS * 2) {
+            thief.isDead = true;
+            thief.respawnTimer = 5000;
+            thief.stats.deaths++;
+            cop.stats.captures++;
+
+            if (policeTeam === 'teamA') {
+              teamScores.teamA++;
+            } else {
+              teamScores.teamB++;
+            }
+
+            spawnParticles(thief.x, thief.y, 16, 'capture');
+            sound.playCapture();
+            updateHeaderUI();
+          }
+        });
+      });
+
+      updateParticles(dt);
+    }
+
+    function respawnThief(p) {
+      p.isDead = false;
+      p.invulnerableTimer = 5000;
+      p.speedBoostTimer = 5;
+      p.speedBoostCount = 0;
+
+      // Respawn in vertical middle of their respective keypad column
+      const colWidth = boardWidth / playerCount;
+      p.x = boardOffsetX + colWidth * (p.id - 0.5);
+      p.y = boardOffsetY + boardHeight / 2; // Spawn at vertical center!
+      p.angle = -Math.PI / 2;
+
+      sound.playRespawn();
+    }
+
+    function updatePlayerHUD(p) {
+      const statsSpan = document.getElementById(`ctrl-stats-p${p.id}`);
+      const card = document.getElementById(`status-circle-p${p.id}`);
+      const icon = document.getElementById(`status-icon-p${p.id}`);
+      const label = document.getElementById(`status-label-p${p.id}`);
+
+      if (!statsSpan || !card || !icon || !label) return;
+
+      if (p.role === 'police') {
+        statsSpan.textContent = `검거: ${p.stats.captures}`;
+        card.className = 'status-circle police';
+        icon.textContent = p.emoji;
+        label.textContent = '추격';
+      } else {
+        if (p.isDead) {
+          const rem = Math.ceil(p.respawnTimer / 1000);
+          statsSpan.textContent = `체포됨 (⛓️)`;
+          card.className = 'status-circle jail';
+          icon.textContent = '⛓️';
+          label.textContent = `${rem}초`;
+        } else if (p.invulnerableTimer > 0) {
+          statsSpan.textContent = `속도: 3.2 (🛡️)`;
+          card.className = 'status-circle shield';
+          icon.textContent = '🛡️';
+          label.textContent = '무적';
+        } else if (p.speedBoostTimer > 0) {
+          const ratio = (1.8 * (1 + p.speedBoostCount * 0.4)).toFixed(1);
+          statsSpan.textContent = `속도: ${ratio} (⚡)`;
+          card.className = 'status-circle boost';
+          icon.textContent = '⚡';
+          label.textContent = `가속 x${p.speedBoostCount}`;
+        } else {
+          statsSpan.textContent = `속도: 1.8 (🏃)`;
+          card.className = 'status-circle normal';
+          icon.textContent = '🏃';
+          label.textContent = '도주';
+        }
+      }
+    }
+
+    /* =========================================================================
+       CANVAS RENDERING (GRID lines, OBSTACLES, MONEY, PARTICLES, PLAYERS)
+       ========================================================================= */
+    function renderGame() {
+      ctx.fillStyle = '#06060b';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+
+      ctx.fillStyle = '#0a0a0f';
+      ctx.fillRect(boardOffsetX, boardOffsetY, boardWidth, boardHeight);
+
+      // Grid line pattern
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.lineWidth = 1;
+      for (let c = 0; c <= GRID_COLS; c++) {
+        ctx.beginPath();
+        ctx.moveTo(boardOffsetX + c * cellSize, boardOffsetY);
+        ctx.lineTo(boardOffsetX + c * cellSize, boardOffsetY + boardHeight);
+        ctx.stroke();
+      }
+      for (let r = 0; r <= GRID_ROWS; r++) {
+        ctx.beginPath();
+        ctx.moveTo(boardOffsetX, boardOffsetY + r * cellSize);
+        ctx.lineTo(boardOffsetX + boardWidth, boardOffsetY + r * cellSize);
+        ctx.stroke();
+      }
+
+      // Border glow
+      ctx.save();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 5;
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.85)';
+      ctx.shadowBlur = 15;
+      ctx.strokeRect(boardOffsetX, boardOffsetY, boardWidth, boardHeight);
+      ctx.restore();
+
+      // Render Money Emojis
+      moneyItems.forEach(m => {
+        ctx.save();
+        ctx.font = '22px "Segoe UI Emoji", "Apple Color Emoji", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowBlur = 0; // Performance: disable shadow
+        ctx.fillText('💰', boardOffsetX + m.x, boardOffsetY + m.y);
+        ctx.restore();
+      });
+
+      // Render Obstacles (With solid backgrounds and bright outlines for maximum visibility)
+      obstacles.forEach(obs => {
+        const ox = boardOffsetX + obs.x;
+        const oy = boardOffsetY + obs.y;
+
+        ctx.save();
+        const isBrick = obs.emoji === '🧱';
+
+        if (isBrick) {
+          ctx.fillStyle = '#2d140e';      // Solid deep brick red
+          ctx.strokeStyle = '#ff4500';    // Glowing hot orange border
+        } else {
+          ctx.fillStyle = '#082310';      // Solid deep forest green
+          ctx.strokeStyle = '#39d353';    // Glowing neon green border
+        }
+
+        ctx.lineWidth = 3.5;
+        ctx.shadowBlur = 0; // Performance: disable shadow
+
+        ctx.fillRect(ox, oy, obs.w, obs.h);
+        ctx.strokeRect(ox, oy, obs.w, obs.h);
+
+        ctx.font = `${obs.w * 0.55}px "Segoe UI Emoji", "Apple Color Emoji", Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(obs.emoji, ox + obs.w / 2, oy + obs.h / 2);
+        ctx.restore();
+      });
+
+      // Render Moving Cars
+      movingCars.forEach(car => {
+        ctx.save();
+        const cx = boardOffsetX + car.x;
+        const cy = boardOffsetY + car.y;
+
+        ctx.fillStyle = '#1c1c28';
+        ctx.strokeStyle = '#ff9500'; // glowing orange headlights
+        ctx.lineWidth = 3;
+        ctx.shadowBlur = 0; // Performance: disable shadow
+
+        ctx.fillRect(cx - car.w / 2, cy - car.h / 2, car.w, car.h);
+        ctx.strokeRect(cx - car.w / 2, cy - car.h / 2, car.w, car.h);
+
+        ctx.translate(cx, cy);
+
+        if (car.direction === 'down') {
+          ctx.rotate(Math.PI / 2);
+        } else if (car.direction === 'up') {
+          ctx.rotate(-Math.PI / 2);
+        } else if (car.direction === 'left') {
+          ctx.scale(-1, 1);
+        }
+
+        ctx.font = '24px "Segoe UI Emoji", "Apple Color Emoji", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(car.emoji, 0, 0);
+        ctx.restore();
+      });
+
+      // Render Players
+      players.forEach(p => {
+        if (p.isDead) return;
+
+        ctx.save();
+
+        const isPolice = p.role === 'police';
+        const roleColor = isPolice ? '#007aff' : '#ff2d55';
+
+        ctx.shadowBlur = 0; // Performance: disable shadow
+        ctx.strokeStyle = roleColor;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, PLAYER_RADIUS, 0, Math.PI * 2);
+        ctx.stroke();
+
+        if (p.role === 'thief' && p.speedBoostTimer > 0) {
+          ctx.strokeStyle = '#ffcc00';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, PLAYER_RADIUS + 3, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        if (p.role === 'thief' && p.invulnerableTimer > 0) {
+          ctx.save();
+          ctx.strokeStyle = '#4cd964';
+          ctx.lineWidth = 3;
+          ctx.setLineDash([6, 5]);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, PLAYER_RADIUS + 6, lastTime * 0.003, lastTime * 0.003 + Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        ctx.font = '33px "Segoe UI Emoji", "Apple Color Emoji", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.emoji, p.x, p.y);
+
+        ctx.fillStyle = roleColor;
+        ctx.font = 'bold 12px Orbitron';
+        const tagText = `${p.id}P${(p.role === 'thief' && p.speedBoostTimer > 0) ? ' ⚡' + p.speedBoostCount : ''}`;
+        ctx.fillText(tagText, p.x, p.y - PLAYER_RADIUS - 10);
+
+        const noseX = p.x + Math.cos(p.angle) * (PLAYER_RADIUS - 2);
+        const noseY = p.y + Math.sin(p.angle) * (PLAYER_RADIUS - 2);
+        ctx.beginPath();
+        ctx.arc(noseX, noseY, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.restore();
+      });
+
+      renderParticles();
+
+      // Semi-transparent overlay card for role confirmation phase
+      if (isWaitingForConfirmation) {
+        ctx.fillStyle = 'rgba(4, 4, 8, 0.55)';
+        ctx.fillRect(boardOffsetX, boardOffsetY, boardWidth, boardHeight);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 22px "Inter", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('각자 하단에서 역할을 확인하고 [확인]을 누르세요!', boardOffsetX + boardWidth / 2, boardOffsetY + boardHeight / 2 - 20);
+
+        ctx.fillStyle = '#ffcc00';
+        ctx.font = '16px "Inter", sans-serif';
+        ctx.fillText('모든 플레이어가 완료하면 추격전이 시작됩니다.', boardOffsetX + boardWidth / 2, boardOffsetY + boardHeight / 2 + 20);
+      }
+
+      // Render Countdown overlays (3, 2, 1, 시작!)
+      if (isCountdown || countdownText) {
+        ctx.fillStyle = 'rgba(4, 4, 8, 0.4)';
+        ctx.fillRect(boardOffsetX, boardOffsetY, boardWidth, boardHeight);
+
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        if (countdownText === "시작!") {
+          ctx.fillStyle = '#00ff66';
+          ctx.font = 'bold 72px "Inter", sans-serif';
+          ctx.shadowColor = '#00ff66';
+        } else {
+          ctx.fillStyle = '#ffcc00';
+          ctx.font = 'bold 80px "Orbitron", sans-serif';
+          ctx.shadowColor = '#ffcc00';
+        }
+        ctx.shadowBlur = 15;
+        ctx.fillText(countdownText, boardOffsetX + boardWidth / 2, boardOffsetY + boardHeight / 2);
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    /* =========================================================================
+       ROUND SWITCHING & HALFTIME SWAP TRANSITIONS
+       ========================================================================= */
+    function handleRoundEnd() {
+      clearInterval(roundInterval);
+      sound.playTimeOver();
+
+      window.round1PlayersData = players.map(p => ({
+        id: p.id,
+        stats: { ...p.stats }
+      }));
+
+      if (currentRound === 1) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+
+        const policeLabel = policeTeam === 'teamA' ? 'A팀' : 'B팀';
+        const captures = policeTeam === 'teamA' ? teamScores.teamA : teamScores.teamB;
+
+        document.getElementById('halftime-msg-text').innerHTML = `
+          1라운드가 끝났습니다.<br>
+          경찰을 맡은 <b>${policeLabel}</b>이 도둑을 총 <b>${captures}번</b> 검거하였습니다!
+        `;
+        document.getElementById('halftime-overlay').style.display = 'block';
+      } else {
+        endGame();
+      }
+    }
+
+    function startRound2() {
+      currentRound = 2;
+      policeTeam = (policeTeam === 'teamA') ? 'teamB' : 'teamA';
+      startRound();
+    }
+
+    /* =========================================================================
+       GAME OVER & LEADERBOARD LOGIC
+       ========================================================================= */
+    function endGame() {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+      clearInterval(roundInterval);
+
+      sound.playGameOver();
+
+      const aScore = teamScores.teamA;
+      const bScore = teamScores.teamB;
+
+      const winnerDiv = document.getElementById('winner-announcement');
+      if (aScore > bScore) {
+        winnerDiv.innerHTML = `🏆 A팀 승리! (검거: ${aScore} vs ${bScore})`;
+        winnerDiv.style.color = '#007aff';
+      } else if (bScore > aScore) {
+        winnerDiv.innerHTML = `🏆 B팀 승리! (검거: ${bScore} vs ${aScore})`;
+        winnerDiv.style.color = '#ff2d55';
+      } else {
+        winnerDiv.innerHTML = `🤝 무승부! (검거: ${aScore} vs ${bScore})`;
+        winnerDiv.style.color = '#00c7be';
+      }
+
+      const tbody = document.getElementById('leaderboard-body-overlay');
+      tbody.innerHTML = '';
+
+      players.forEach(p => {
+        const teamLabel = p.team === 'teamA' ? 'A팀' : 'B팀';
+        const teamColor = p.team === 'teamA' ? '#007aff' : '#ff2d55';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color: ${p.color}">PLAYER ${p.id}</td>
+          <td style="color: ${teamColor}">${teamLabel}</td>
+          <td>${p.stats.captures}</td>
+          <td>${p.stats.coinsEaten}</td>
+          <td>${p.stats.deaths}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('gameover-overlay').style.display = 'block';
+    }
+  </script>
+</body>
+
+</html>
