@@ -679,7 +679,8 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 20;
+      z-index: 100000;
+      /* 조이스틱 컨테이너(z-index 99999)보다 위에 있어야 역할 확인 화면을 완전히 덮는다 */
       padding: 12px;
       text-align: center;
       transition: opacity 0.3s ease;
@@ -1360,41 +1361,53 @@
     }
 
     function findSafeHorizontalPaths(carH) {
-      const paths = [];
-      for (let y = carH + 15; y < boardHeight - carH - 15; y += 10) {
-        let overlap = false;
+      // 화면 중앙을 기준으로 상하 대칭인 두 경로(위쪽/아래쪽)를 찾는다.
+      // 큰 offset(가장자리에 가까운 쪽)부터 시도해 위·아래로 확실히 지나가도록 함.
+      const center = boardHeight / 2;
+      const maxOffset = Math.floor(boardHeight * 0.42);
+      const minOffset = Math.floor(boardHeight * 0.12);
+
+      for (let offset = maxOffset; offset >= minOffset; offset -= 6) {
+        const topY = center - offset;
+        const bottomY = center + offset;
+        let clear = true;
         for (const obs of obstacles) {
-          if (!(y + carH / 2 + 10 < obs.y || y - carH / 2 - 10 > obs.y + obs.h)) {
-            overlap = true;
+          const topHit = !(topY + carH / 2 + 10 < obs.y || topY - carH / 2 - 10 > obs.y + obs.h);
+          const bottomHit = !(bottomY + carH / 2 + 10 < obs.y || bottomY - carH / 2 - 10 > obs.y + obs.h);
+          if (topHit || bottomHit) {
+            clear = false;
             break;
           }
         }
-        if (!overlap) {
-          if (paths.length === 0 || Math.abs(paths[0] - y) > 100) {
-            paths.push(y);
-            if (paths.length >= 2) break;
-          }
-        }
+        if (clear) return [topY, bottomY];
       }
-      if (paths.length < 1) paths.push(boardHeight * 0.12);
-      if (paths.length < 2) paths.push(boardHeight * 0.88);
-      return paths;
+      // fallback: 대칭 고정값 (위쪽 / 아래쪽)
+      return [boardHeight * 0.10, boardHeight * 0.90];
     }
 
-    function findSafeVerticalPath(carW) {
-      for (let x = Math.floor(boardWidth * 0.25); x < Math.floor(boardWidth * 0.75); x += 10) {
-        let overlap = false;
+    function findSafeVerticalPaths(carW) {
+      // 중앙을 기준으로 좌우 대칭인 두 개의 세로 경로(왼쪽/오른쪽)를 찾는다.
+      // 넓게 벌어진(큰 offset) 경로부터 시도하여 자동차가 좌우로 시원하게 배치되도록 함.
+      const center = boardWidth / 2;
+      const maxOffset = Math.floor(boardWidth * 0.34);
+      const minOffset = Math.floor(boardWidth * 0.08);
+
+      for (let offset = maxOffset; offset >= minOffset; offset -= 6) {
+        const leftX = center - offset;
+        const rightX = center + offset;
+        let clear = true;
         for (const obs of obstacles) {
-          if (!(x + carW / 2 + 10 < obs.x || x - carW / 2 - 10 > obs.x + obs.w)) {
-            overlap = true;
+          const leftHit = !(leftX + carW / 2 + 10 < obs.x || leftX - carW / 2 - 10 > obs.x + obs.w);
+          const rightHit = !(rightX + carW / 2 + 10 < obs.x || rightX - carW / 2 - 10 > obs.x + obs.w);
+          if (leftHit || rightHit) {
+            clear = false;
             break;
           }
         }
-        if (!overlap) {
-          return x;
-        }
+        if (clear) return [leftX, rightX];
       }
-      return boardWidth * 0.35;
+      // fallback: 장애물과 겹쳐도 대칭 고정값 사용
+      return [center - boardWidth * 0.28, center + boardWidth * 0.28];
     }
 
     /* =========================================================================
@@ -1489,13 +1502,16 @@
       }
 
       const hPaths = findSafeHorizontalPaths(38);
-      const vPath = findSafeVerticalPath(38);
+      const vPaths = findSafeVerticalPaths(38);
 
-      // Initialize moving cars using safe paths (no overlap, no collision with wall obstacles)
+      // 상하좌우 대칭으로 자동차 4대 배치
+      //  - 가로: 위쪽(오른쪽 이동) / 아래쪽(왼쪽 이동)
+      //  - 세로: 왼쪽(아래로 이동) / 오른쪽(위로 이동)
       movingCars = [
         { x: -50, y: hPaths[0], w: 72, h: 38, vx: 2.2, vy: 0, emoji: '🚗', direction: 'right' },
         { x: boardWidth + 50, y: hPaths[1], w: 72, h: 38, vx: -2.2, vy: 0, emoji: '🚕', direction: 'left' },
-        { x: vPath, y: -50, w: 38, h: 72, vx: 0, vy: 1.8, emoji: '🏎️', direction: 'down' }
+        { x: vPaths[0], y: -50, w: 38, h: 72, vx: 0, vy: 1.8, emoji: '🏎️', direction: 'down' },
+        { x: vPaths[1], y: boardHeight + 50, w: 38, h: 72, vx: 0, vy: -1.8, emoji: '🚙', direction: 'up' }
       ];
 
       // Initialise player starting positions
@@ -2371,13 +2387,16 @@
 
         ctx.translate(cx, cy);
 
+        // 자동차 이모지는 기본적으로 '왼쪽'을 바라보므로,
+        // 실제 진행 방향으로 앞(전면)이 향하도록 회전/반전을 보정한다.
         if (car.direction === 'down') {
-          ctx.rotate(Math.PI / 2);
+          ctx.rotate(-Math.PI / 2); // 왼쪽 → 아래
         } else if (car.direction === 'up') {
-          ctx.rotate(-Math.PI / 2);
-        } else if (car.direction === 'left') {
-          ctx.scale(-1, 1);
+          ctx.rotate(Math.PI / 2);  // 왼쪽 → 위
+        } else if (car.direction === 'right') {
+          ctx.scale(-1, 1);         // 왼쪽 → 오른쪽 (좌우 반전)
         }
+        // 'left'는 기본 방향(왼쪽)이므로 변환 없음
 
         ctx.font = '24px "Segoe UI Emoji", "Apple Color Emoji", Arial, sans-serif';
         ctx.textAlign = 'center';
